@@ -1,0 +1,6 @@
+{
+    "editor.formatOnSave": true,
+    "jest.autoRun": { "watch": false },
+    "jest.showCoverageOnLoad": false
+  }
+  
