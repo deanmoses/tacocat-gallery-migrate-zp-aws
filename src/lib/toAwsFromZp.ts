@@ -1,6 +1,6 @@
 import { AwsAlbum, AwsGalleryItem, AwsImageItem, Rectangle } from './awsTypes.js';
 import { getParentAndNameFromPath, isValidAlbumPath, isValidImagePath } from './galleryPathUtils.js';
-import { ZenphotoAlbum, ZenphotoAlbumItem, ZenphotoImageItem } from './zenphotoTypes.js';
+import { ZenphotoAlbum, ZenphotoImageItem } from './zenphotoTypes.js';
 
 /** Convert from Zenphoto to DynamoDB album */
 export function convertAlbum(zpAlbum: ZenphotoAlbum): AwsGalleryItem[] {
@@ -23,7 +23,6 @@ export function convertAlbum(zpAlbum: ZenphotoAlbum): AwsGalleryItem[] {
     if (zpAlbum.desc) awsAlbum.description = zpAlbum.desc;
     items.push(awsAlbum);
     if (!!zpAlbum.images) items = items.concat(convertChildImages(zpAlbum.images));
-    if (!!zpAlbum.albums) items = items.concat(convertChildAlbums(zpAlbum.albums));
     return items;
 }
 
@@ -46,12 +45,6 @@ function convertDate(zpDate: number): string {
 /** Convert album's images */
 function convertChildImages(zpImages: ZenphotoImageItem[]): AwsImageItem[] {
     return zpImages?.map((zpImage) => convertImage(zpImage)) || [];
-}
-
-/** Convert album's child albums */
-function convertChildAlbums(zpAlbums: ZenphotoAlbumItem[]): AwsAlbum[] {
-    console.log('toAwsFromZpChildAlbums', zpAlbums);
-    return []; // todo implement
 }
 
 /** Convert an image */
