@@ -1,9 +1,35 @@
-import { AwsAlbum, AwsImageItem } from './awsTypes.js';
-import { convertAlbum, convertImage } from './toAwsFromZp.js';
+import { AwsAlbum, AwsGalleryItem, AwsImageItem, Rectangle } from './awsTypes.js';
+import { convertAlbum, convertCrop, convertImage } from './toAwsFromZp.js';
 import { ZenphotoAlbum, ZenphotoImageItem } from './zenphotoTypes.js';
 
-it('Should convert album', () => {
-    expect(convertAlbum(zpAlbum)).toEqual(awsAlbum);
+describe('parseCrop', () => {
+    const tests: { url: string; expected: Rectangle | undefined }[] = [
+        {
+            url: '/zenphoto/cache/2001/12-31/image_200_w200_h200_cw200_ch200_thumb.jpg?cached=1552859752',
+            expected: {
+                width: 200,
+                height: 200,
+            },
+        },
+        {
+            url: '/zenphoto/cache/2001/12-31/all_dressed_up_w200_h200_cw960_ch960_cx61_cy0_thumb.jpg?cached=1419239961',
+            expected: {
+                x: 61,
+                y: 0,
+                width: 960,
+                height: 960,
+            },
+        },
+        {
+            url: '/zenphoto/cache/2001/12-31/image_200_w200_h200_thumb.jpg?cached=1552859752',
+            expected: undefined,
+        },
+    ];
+    tests.forEach((test) => {
+        it(`Parse ${test.url} → ${JSON.stringify(test.expected)}`, () => {
+            expect(convertCrop(test.url)).toEqual(test.expected);
+        });
+    });
 });
 
 it('Should convert image', () => {
@@ -22,9 +48,13 @@ it('Should convert image', () => {
     const awsImage: AwsImageItem = {
         itemType: 'image',
         parentPath: '/2001/12-31/',
+        thumbnail: {
+            height: 200,
+            width: 200,
+        },
         itemName: 'image.jpg',
-        versionId: 'TODO', // TODO: figure out versionId
         createdOn: '2014-12-04T08:00:00.000Z',
+        updatedOn: '2014-12-04T08:00:00.000Z',
         title: 'Title',
         description: 'Description',
         dimensions: {
@@ -43,7 +73,7 @@ it('Should convert HTML entities in image title', () => {
         date: 1417680000,
         url_full: '/zenphoto/albums/2001/12-31/image.jpg',
         url_sized: '/zenphoto/cache/2001/12-31/image_1024.jpg?cached=1491244699',
-        url_thumb: '/zenphoto/cache/2001/12-31/image_200_w200_h200_cw200_ch200_thumb.jpg?cached=1552859752',
+        url_thumb: '/zenphoto/cache/2001/12-31/image_200_w200_h200_thumb.jpg?cached=1552859752',
         width: 1280,
         height: 960,
         index: 0,
@@ -52,8 +82,8 @@ it('Should convert HTML entities in image title', () => {
         itemType: 'image',
         parentPath: '/2001/12-31/',
         itemName: 'image.jpg',
-        versionId: 'TODO', // TODO: figure out versionId
         createdOn: '2014-12-04T08:00:00.000Z',
+        updatedOn: '2014-12-04T08:00:00.000Z',
         title: 'HTML & Entity',
         description: '<p>HTML &amp; Entity</p>',
         dimensions: {
@@ -64,12 +94,20 @@ it('Should convert HTML entities in image title', () => {
     expect(convertImage(zpImage)).toEqual(awsImage);
 });
 
+it('Should convert album', () => {
+    const items: AwsGalleryItem[] = convertAlbum(zpAlbum);
+    if (!items) throw new Error('Did not receive items');
+    expect(items.length).toBe(28);
+    expect(items[0]).toEqual(awsAlbum);
+});
+
 const zpAlbum: ZenphotoAlbum = {
     path: '2001/12-31',
     title: '12-31',
     date: 1009785600,
     date_updated: 1417735026,
     customdata: 'Christmas and New Year',
+    published: true,
     image_size: 1024,
     thumb_size: 200,
     url_thumb: '/zenphoto/cache/2001/12-31/all_dressed_up_w200_h200_cw960_ch960_cx61_cy0_thumb.jpg?cached=1419239961',
@@ -440,5 +478,6 @@ const awsAlbum: AwsAlbum = {
     createdOn: '2001-12-31T08:00:00.000Z',
     updatedOn: '2014-12-04T23:17:06.000Z',
     summary: 'Christmas and New Year',
+    published: true,
     children: undefined,
 };

@@ -28,7 +28,7 @@ export type AwsAlbumItem = AwsBaseGalleryRecord & {
 };
 
 export type AwsImageItem = AwsBaseGalleryRecord & {
-    versionId: string;
+    versionId?: string;
     dimensions: Size;
     thumbnail?: ImageThumbnailCrop;
     title?: string;
@@ -41,7 +41,7 @@ export type AwsBaseGalleryRecord = {
     itemName: string;
     itemType: GalleryItemType;
     createdOn: string;
-    updatedOn?: string;
+    updatedOn: string;
     description?: string;
 };
 
@@ -49,20 +49,18 @@ export type GalleryItemType = 'album' | 'image';
 
 export type AlbumThumbnailEntry = {
     path: string;
-    versionId: string;
-    crop?: Rectangle;
 };
 
 export type ImageThumbnailCrop = Rectangle;
 
-export type Rectangle = Point & Size;
-
-export type Point = {
-    x: number;
-    y: number;
-};
+export type Rectangle = Size & Partial<Point>;
 
 export type Size = {
     width: number;
     height: number;
+};
+
+export type Point = {
+    x: number;
+    y: number;
 };
