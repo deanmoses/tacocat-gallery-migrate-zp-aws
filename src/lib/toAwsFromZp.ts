@@ -20,26 +20,10 @@ export function convertAlbum(zpAlbum: ZenphotoAlbum): AwsGalleryItem[] {
         published: 'published' in zpAlbum ? !!zpAlbum.published : true,
     };
     if (zpAlbum.customdata) awsAlbum.summary = zpAlbum.customdata;
-    if (zpAlbum.desc) awsAlbum.description = zpAlbum.desc;
+    if (zpAlbum.desc) awsAlbum.description = convertDescription(zpAlbum.desc);
     items.push(awsAlbum);
     if (!!zpAlbum.images) items = items.concat(convertChildImages(zpAlbum.images));
     return items;
-}
-
-/** Convert from 2001/12-31 to /2001/12-31/ */
-function convertAlbumPath(albumPath: string): string {
-    return `/${albumPath}/`;
-}
-
-/** Convert from 2001/12-31/image.jpg to /2001/12-31/image.jpg */
-function convertImagePath(imagePath: string): string {
-    return `/${imagePath}`;
-}
-
-/** Convert from 1009785600 to ISO string */
-function convertDate(zpDate: number): string {
-    if (!zpDate) throw new Error(`Invalid date: ${zpDate}`);
-    return new Date(zpDate * 1000).toISOString();
 }
 
 /** Convert album's images */
@@ -70,10 +54,33 @@ export function convertImage(zpImage: ZenphotoImageItem): AwsImageItem {
         },
     };
     if (zpImage.title) awsImage.title = convertTitle(zpImage.title);
-    if (zpImage.desc) awsImage.description = zpImage.desc;
+    else console.warn(`Image has no title: ${imagePath}`);
+    if (zpImage.desc) awsImage.description = convertDescription(zpImage.desc);
     const thumbnail = convertCrop(zpImage.url_thumb);
     if (thumbnail) awsImage.thumbnail = thumbnail;
+    if (!zpImage.path.endsWith('.jpg')) console.warn(`Image is not .jpg: ${zpImage.path}`);
     return awsImage;
+}
+
+/** Convert from 2001/12-31 to /2001/12-31/ */
+function convertAlbumPath(albumPath: string): string {
+    return `/${albumPath}/`;
+}
+
+/**
+ * Convert from
+ *  2001/12-31/image.jpg  to /2001/12-31/image.jpg
+ *  2001/12-31/image.JPG  to /2001/12-31/image.jpg
+ *  2001/12-31/image.jpeg to /2001/12-31/image.jpg
+ */
+export function convertImagePath(imagePath: string): string {
+    return `/${imagePath}`.replace(/\.jpe?g$/gi, '.jpg');
+}
+
+/** Convert from 1009785600 to ISO string */
+function convertDate(zpDate: number): string {
+    if (!zpDate) throw new Error(`Invalid date: ${zpDate}`);
+    return new Date(zpDate * 1000).toISOString();
 }
 
 /**
@@ -106,9 +113,19 @@ function convertTitle(zpTitle: string): string {
 /** Convert any HTML entities from the specified string */
 function convertHtmlEntities(html: string): string {
     return html
-        .replace('&amp;', '&')
-        .replace('&lt;', '<')
-        .replace('&gt;', '>')
-        .replace('&quot;', '"')
-        .replace('&apos;', "'");
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&apos;', "'");
+}
+
+/** Fix up the description in various ways */
+export function convertDescription(zpDescription: string): string {
+    return zpDescription
+        .replaceAll('&nbsp;</p>', '</p>')
+        .replaceAll('<br></p>', '</p>')
+        .replaceAll('<br></li>', '</li>')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&apos;', "'"); // apparently &apos; is only for XML not HTML!
 }

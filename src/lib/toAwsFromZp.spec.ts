@@ -1,8 +1,51 @@
 import { AwsAlbum, AwsGalleryItem, AwsImageItem, Rectangle } from './awsTypes.js';
-import { convertAlbum, convertCrop, convertImage } from './toAwsFromZp.js';
+import { convertAlbum, convertCrop, convertDescription, convertImage, convertImagePath } from './toAwsFromZp.js';
 import { ZenphotoAlbum, ZenphotoImageItem } from './zenphotoTypes.js';
 
-describe('parseCrop', () => {
+describe('convert image path', () => {
+    const imagePaths: { zp: string; aws: string }[] = [
+        { zp: '2001/12-31/image.jpg', aws: '/2001/12-31/image.jpg' },
+        { zp: '2001/12-31/image.JPG', aws: '/2001/12-31/image.jpg' },
+        { zp: '2001/12-31/image.jpeg', aws: '/2001/12-31/image.jpg' },
+    ];
+    imagePaths.forEach((imagePaths) => {
+        it(`Convert ${imagePaths.zp} → ${imagePaths.aws}`, () => {
+            expect(convertImagePath(imagePaths.zp)).toEqual(imagePaths.aws);
+        });
+    });
+});
+
+describe('convert description', () => {
+    const descriptions: { zp: string; aws: string }[] = [
+        {
+            zp: '<p>Oh - getting the permits. &nbsp;Lining up DJs. &nbsp;Collecting couches.</p>',
+            aws: '<p>Oh - getting the permits.  Lining up DJs.  Collecting couches.</p>',
+        },
+        {
+            zp: '<p>Description.&nbsp;</p>',
+            aws: '<p>Description.</p>',
+        },
+        {
+            zp: '<p>Description.<br></p>',
+            aws: '<p>Description.</p>',
+        },
+        {
+            zp: '<p>Confab in the kitchen. No doubt discussing one of two things:<br></p><ol><li>DJ lineup<br></li><li>Logistics around cooking and serving grilled cheese to the unwashed masses&nbsp;nearly nonstop for 7 days.</li></ol>',
+            aws: '<p>Confab in the kitchen. No doubt discussing one of two things:</p><ol><li>DJ lineup</li><li>Logistics around cooking and serving grilled cheese to the unwashed masses nearly nonstop for 7 days.</li></ol>',
+        },
+        {
+            zp: 'Lucie&apos;s really shaking things up on New Year&apos;s Eve.',
+            aws: "Lucie's really shaking things up on New Year's Eve.",
+        },
+    ];
+    descriptions.forEach((description) => {
+        it(`Convert ${description.zp} → ${description.aws}`, () => {
+            expect(convertDescription(description.zp)).toEqual(description.aws);
+        });
+    });
+});
+
+describe('convert crop', () => {
     const tests: { url: string; expected: Rectangle | undefined }[] = [
         {
             url: '/zenphoto/cache/2001/12-31/image_200_w200_h200_cw200_ch200_thumb.jpg?cached=1552859752',
@@ -23,7 +66,7 @@ describe('parseCrop', () => {
         },
     ];
     tests.forEach((test) => {
-        it(`Parse ${test.url} → ${JSON.stringify(test.expected)}`, () => {
+        it(`Convert ${test.url} → ${JSON.stringify(test.expected)}`, () => {
             expect(convertCrop(test.url)).toEqual(test.expected);
         });
     });
@@ -85,6 +128,100 @@ it('Should convert HTML entities in image title', () => {
         },
     };
     expect(convertImage(zpImage)).toEqual(awsImage);
+});
+
+it('Should remove <br></p> from image description', () => {
+    const zpImage: ZenphotoImageItem = {
+        path: '2001/12-31/image.jpg',
+        title: 'Title',
+        desc: '<p>Description.<br></p>',
+        date: 1417680000,
+        url_full: '/zenphoto/albums/2001/12-31/image.jpg',
+        url_sized: '/zenphoto/cache/2001/12-31/image_1024.jpg?cached=1491244699',
+        url_thumb: '/zenphoto/cache/2001/12-31/image_200_w200_h200_thumb.jpg?cached=1552859752',
+        width: 1280,
+        height: 960,
+        index: 0,
+    };
+    const awsImage: AwsImageItem = {
+        itemType: 'image',
+        parentPath: '/2001/12-31/',
+        itemName: 'image.jpg',
+        createdOn: '2014-12-04T08:00:00.000Z',
+        updatedOn: '2014-12-04T08:00:00.000Z',
+        title: 'Title',
+        description: '<p>Description.</p>',
+        dimensions: {
+            width: 1280,
+            height: 960,
+        },
+    };
+    expect(convertImage(zpImage)).toEqual(awsImage);
+});
+
+it('Should remove <br></p> from album description', () => {
+    const items: AwsGalleryItem[] = convertAlbum({
+        path: '2001/12-31',
+        date: 1009785600,
+        desc: '<p>Description.<br></p>',
+        url_thumb: '/zenphoto/cache/2001/12-31/image_w200_h200_thumb.jpg?cached=1419239961',
+    });
+    expect(items[0]).toEqual({
+        itemType: 'album',
+        parentPath: '/2001/',
+        itemName: '12-31',
+        createdOn: '2001-12-31T08:00:00.000Z',
+        updatedOn: '2001-12-31T08:00:00.000Z',
+        published: true,
+        description: '<p>Description.</p>',
+    });
+});
+
+it('Should remove &nbsp;</p> from image description', () => {
+    const zpImage: ZenphotoImageItem = {
+        path: '2001/12-31/image.jpg',
+        title: 'Title',
+        desc: '<p>Description.&nbsp;</p>',
+        date: 1417680000,
+        url_full: '/zenphoto/albums/2001/12-31/image.jpg',
+        url_sized: '/zenphoto/cache/2001/12-31/image_1024.jpg?cached=1491244699',
+        url_thumb: '/zenphoto/cache/2001/12-31/image_200_w200_h200_thumb.jpg?cached=1552859752',
+        width: 1280,
+        height: 960,
+        index: 0,
+    };
+    const awsImage: AwsImageItem = {
+        itemType: 'image',
+        parentPath: '/2001/12-31/',
+        itemName: 'image.jpg',
+        createdOn: '2014-12-04T08:00:00.000Z',
+        updatedOn: '2014-12-04T08:00:00.000Z',
+        title: 'Title',
+        description: '<p>Description.</p>',
+        dimensions: {
+            width: 1280,
+            height: 960,
+        },
+    };
+    expect(convertImage(zpImage)).toEqual(awsImage);
+});
+
+it('Should remove &nbsp;</p> from album description', () => {
+    const items: AwsGalleryItem[] = convertAlbum({
+        path: '2001/12-31',
+        date: 1009785600,
+        desc: '<p>Description.&nbsp;</p>',
+        url_thumb: '/zenphoto/cache/2001/12-31/image_w200_h200_thumb.jpg?cached=1419239961',
+    });
+    expect(items[0]).toEqual({
+        itemType: 'album',
+        parentPath: '/2001/',
+        itemName: '12-31',
+        createdOn: '2001-12-31T08:00:00.000Z',
+        updatedOn: '2001-12-31T08:00:00.000Z',
+        published: true,
+        description: '<p>Description.</p>',
+    });
 });
 
 it('Should convert album without publish status as published', () => {
