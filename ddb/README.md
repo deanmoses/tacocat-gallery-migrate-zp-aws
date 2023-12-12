@@ -1,0 +1,1 @@
+This directory is where the system saves the generated DynamoDB table import files.

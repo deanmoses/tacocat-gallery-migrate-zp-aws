@@ -1,0 +1,1 @@
+This directory is where the system looks for a SQLite database named `gallery.db`

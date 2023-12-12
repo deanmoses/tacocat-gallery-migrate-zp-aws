@@ -1,7 +1,7 @@
 {
     "name": "tacocat-gallery-migrate-zp-aws",
     "version": "0.0.1",
-    "description": "Migrate Tacocat Gallery from Zenphoto to AWS",
+    "description": "Scripts to migrate Tacocat Gallery from Zenphoto to AWS",
     "author": "Dean Moses",
     "license": "ISC",
     "type": "module",
