@@ -17,7 +17,7 @@ export function convertAlbum(zpAlbum: ZenphotoAlbum): AwsGalleryItem[] {
         itemName: pathParts.name,
         createdOn: convertDate(zpAlbum.date),
         updatedOn: zpAlbum.date_updated ? convertDate(zpAlbum.date_updated) : convertDate(zpAlbum.date),
-        published: !!zpAlbum.published,
+        published: 'published' in zpAlbum ? !!zpAlbum.published : true,
     };
     if (zpAlbum.customdata) awsAlbum.summary = zpAlbum.customdata;
     if (zpAlbum.desc) awsAlbum.description = zpAlbum.desc;

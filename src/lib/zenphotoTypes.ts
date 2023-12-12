@@ -18,7 +18,7 @@ export type ZenphotoGalleryItem = ZenphotoAlbumItem | ZenphotoImageItem;
 
 /** Album without children */
 export type ZenphotoAlbumItem = ZenphotoBaseGalleryRecord & {
-    published: boolean;
+    published?: boolean;
 };
 
 export type ZenphotoImageItem = ZenphotoBaseGalleryRecord & {

@@ -87,6 +87,39 @@ it('Should convert HTML entities in image title', () => {
     expect(convertImage(zpImage)).toEqual(awsImage);
 });
 
+it('Should convert album without publish status as published', () => {
+    const items: AwsGalleryItem[] = convertAlbum({
+        path: '2001/12-31',
+        date: 1009785600,
+        url_thumb: '/zenphoto/cache/2001/12-31/image_w200_h200_thumb.jpg?cached=1419239961',
+    });
+    expect(items[0]).toEqual({
+        itemType: 'album',
+        parentPath: '/2001/',
+        itemName: '12-31',
+        createdOn: '2001-12-31T08:00:00.000Z',
+        updatedOn: '2001-12-31T08:00:00.000Z',
+        published: true,
+    });
+});
+
+it('Should convert unpublished album as unpublished', () => {
+    const items: AwsGalleryItem[] = convertAlbum({
+        path: '2001/12-31',
+        date: 1009785600,
+        url_thumb: '/zenphoto/cache/2001/12-31/image_w200_h200_thumb.jpg?cached=1419239961',
+        published: false,
+    });
+    expect(items[0]).toEqual({
+        itemType: 'album',
+        parentPath: '/2001/',
+        itemName: '12-31',
+        createdOn: '2001-12-31T08:00:00.000Z',
+        updatedOn: '2001-12-31T08:00:00.000Z',
+        published: false,
+    });
+});
+
 it('Should convert album', () => {
     const items: AwsGalleryItem[] = convertAlbum(zpAlbum);
     if (!items) throw new Error('Did not receive items');
