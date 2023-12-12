@@ -8,7 +8,6 @@ const TABLE_NAME = 'GalleryItems';
 export async function getAllItems(): Promise<AwsGalleryItem[]> {
     const db = await openDb();
     const results = await db.all(`SELECT json FROM ${TABLE_NAME}`);
-    console.log('getAllItems', results);
     const items: AwsGalleryItem[] = [];
     for (const result of results) {
         items.push(JSON.parse(result.json));
