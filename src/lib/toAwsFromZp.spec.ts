@@ -45,6 +45,26 @@ describe('convert description', () => {
             zp: "<p>The ceremony.</p>\r\n<p>I forgot... was Rita Zach's best man?</p>",
             aws: "<p>The ceremony.</p> <p>I forgot... was Rita Zach's best man?</p>",
         },
+        {
+            zp: '<a href="https://pix.tacocat.com/#2001/10-21/dan_jen_wedding01.jpg">',
+            aws: '<a href="/2001/10-21/dan_jen_wedding01.jpg">',
+        },
+        {
+            zp: '<a href="https://pix.tacocat.com/#2018/03-03/q_homestack2.jpg">',
+            aws: '<a href="/2018/03-03/q_homestack2.jpg">',
+        },
+        {
+            zp: '<a href="#2004/12-05/tub1.jpg">',
+            aws: '<a href="/2004/12-05/tub1.jpg">',
+        },
+        {
+            zp: '<a href="#2018/06-29">',
+            aws: '<a href="/2018/06-29">',
+        },
+        {
+            zp: '<a href="#2018/06-09">',
+            aws: '<a href="/2018/06-09">',
+        },
     ];
     descriptions.forEach((description) => {
         it(`Convert ${description.zp} → ${description.aws}`, () => {

@@ -122,12 +122,16 @@ function convertHtmlEntities(html: string): string {
 
 /** Fix up the description in various ways */
 export function convertDescription(zpDescription: string): string {
+    // TODO: <a href="http://tacocat.com/pix/2002/06/03/html/jasper1.htm"> -- not sure these exist, keep an eye out
+    if (zpDescription.includes('tacocat.com/pix/')) console.warn(`Description contains /pix/ URL: ${zpDescription}`);
     return zpDescription
-        .replaceAll('&nbsp;</p>', '</p>')
+        .replaceAll('&nbsp;</p>', '</p>') // In this situation, the &nbsp; isn't separating words and can be eliminated
         .replaceAll('<br></p>', '</p>')
         .replaceAll('<br></li>', '</li>')
-        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&nbsp;', ' ') // needs the ' ' because sometimes the &nbsp; is separatating words
         .replaceAll('&apos;', "'") // apparently &apos; is only for XML not HTML!
         .replaceAll('\r\r', ' ')
-        .replaceAll('\r\n', ' ');
+        .replaceAll('\r\n', ' ')
+        .replaceAll('href="https://pix.tacocat.com/#', 'href="/') // <a href="https://pix.tacocat.com/#2001/10-21/dan_jen_wedding01.jpg">
+        .replaceAll('href="#', 'href="/'); // <a href="#2018/06-29">, <a href="#2004/12-05/tub1.jpg">
 }
