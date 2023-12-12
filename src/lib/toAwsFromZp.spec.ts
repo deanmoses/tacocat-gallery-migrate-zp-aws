@@ -6,10 +6,7 @@ describe('parseCrop', () => {
     const tests: { url: string; expected: Rectangle | undefined }[] = [
         {
             url: '/zenphoto/cache/2001/12-31/image_200_w200_h200_cw200_ch200_thumb.jpg?cached=1552859752',
-            expected: {
-                width: 200,
-                height: 200,
-            },
+            expected: undefined,
         },
         {
             url: '/zenphoto/cache/2001/12-31/all_dressed_up_w200_h200_cw960_ch960_cx61_cy0_thumb.jpg?cached=1419239961',
@@ -48,10 +45,6 @@ it('Should convert image', () => {
     const awsImage: AwsImageItem = {
         itemType: 'image',
         parentPath: '/2001/12-31/',
-        thumbnail: {
-            height: 200,
-            width: 200,
-        },
         itemName: 'image.jpg',
         createdOn: '2014-12-04T08:00:00.000Z',
         updatedOn: '2014-12-04T08:00:00.000Z',

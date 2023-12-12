@@ -95,7 +95,7 @@ export function convertCrop(zpThumbUrl: string | undefined): Rectangle | undefin
     );
     if (!z || !z.groups) return undefined;
     const { width, height, x, y } = z.groups;
-    if (!width || !height) return undefined;
+    if (!width || !height || '200' === width || '200' === height) return undefined;
     const crop: Rectangle = {
         width: parseInt(width),
         height: parseInt(height),
