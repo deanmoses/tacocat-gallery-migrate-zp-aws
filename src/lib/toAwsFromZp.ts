@@ -127,5 +127,7 @@ export function convertDescription(zpDescription: string): string {
         .replaceAll('<br></p>', '</p>')
         .replaceAll('<br></li>', '</li>')
         .replaceAll('&nbsp;', ' ')
-        .replaceAll('&apos;', "'"); // apparently &apos; is only for XML not HTML!
+        .replaceAll('&apos;', "'") // apparently &apos; is only for XML not HTML!
+        .replaceAll('\r\r', ' ')
+        .replaceAll('\r\n', ' ');
 }

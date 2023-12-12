@@ -37,6 +37,14 @@ describe('convert description', () => {
             zp: 'Lucie&apos;s really shaking things up on New Year&apos;s Eve.',
             aws: "Lucie's really shaking things up on New Year's Eve.",
         },
+        {
+            zp: "Property inspection.\r\rYup, it's property all right.",
+            aws: "Property inspection. Yup, it's property all right.",
+        },
+        {
+            zp: "<p>The ceremony.</p>\r\n<p>I forgot... was Rita Zach's best man?</p>",
+            aws: "<p>The ceremony.</p> <p>I forgot... was Rita Zach's best man?</p>",
+        },
     ];
     descriptions.forEach((description) => {
         it(`Convert ${description.zp} → ${description.aws}`, () => {
