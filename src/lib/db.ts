@@ -11,7 +11,7 @@ export async function getAllItems(): Promise<AwsGalleryItem[]> {
     console.log('getAllItems', results);
     const items: AwsGalleryItem[] = [];
     for (const result of results) {
-        items.push(result.json);
+        items.push(JSON.parse(result.json));
     }
     return items;
 }
