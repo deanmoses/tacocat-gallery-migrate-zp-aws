@@ -12,6 +12,7 @@
     "main": "index.js",
     "scripts": {
         "zenphoto": "node --loader ts-node/esm src/index.js",
+        "versionIds": "node --loader ts-node/esm src/addVersionIds.js",
         "ddb": "node --loader ts-node/esm src/createDDBfile.js",
         "test": "jest"
     },
@@ -32,6 +33,7 @@
     },
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.470.0",
+        "@aws-sdk/client-s3": "^3.472.0",
         "@aws-sdk/util-dynamodb": "^3.470.0",
         "jsonlines": "^0.1.1",
         "sqlite": "^5.1.1",

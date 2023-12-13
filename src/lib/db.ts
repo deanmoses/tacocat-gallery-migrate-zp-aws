@@ -1,8 +1,16 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import { AwsGalleryItem } from './awsTypes.js';
+import { isValidImagePath } from './galleryPathUtils.js';
 
 const TABLE_NAME = 'GalleryItems';
+
+/** Get the paths under the specified path */
+export async function getPaths(rootPath: string): Promise<string[]> {
+    const db = await openDb();
+    const results = await db.all(`SELECT path FROM ${TABLE_NAME} WHERE path LIKE ?`, rootPath + '%');
+    return results.map((result) => result.path);
+}
 
 /** Retrieve entire database */
 export async function getAllItems(): Promise<AwsGalleryItem[]> {
@@ -22,6 +30,18 @@ export async function getItem(path: string): Promise<AwsGalleryItem> {
     return !results?.json ? undefined : JSON.parse(results.json);
 }
 
+/** Set the S3 versionId of an existing image entry */
+export async function setVersionId(imagePath: string, versionId: string): Promise<void> {
+    if (!isValidImagePath(imagePath)) throw new Error(`Invalid image path: [${imagePath}]`);
+    const db = await openDb();
+    const results = await db.run(
+        `UPDATE ${TABLE_NAME} SET json = json_set(json, '$.versionId', ?) WHERE path = ?`,
+        versionId,
+        imagePath,
+    );
+    if (results?.changes !== 1) throw new Error(`No rows updated for [${imagePath}]`);
+}
+
 /** Create or update mutiple items */
 export async function upsertItems(items: AwsGalleryItem[]): Promise<void> {
     const db = await openDb();
@@ -36,7 +56,8 @@ export async function upsertItem(item: AwsGalleryItem): Promise<void> {
     await db.run(`REPLACE INTO ${TABLE_NAME} (path, json) VALUES(?,?)`, getPath(item), JSON.stringify(item));
 }
 
-function getPath(item: AwsGalleryItem) {
+/** Get the path of the specified item */
+function getPath(item: AwsGalleryItem): string {
     return item.itemType === 'image' ? item.parentPath + item.itemName : item.parentPath + item.itemName + '/';
 }
 

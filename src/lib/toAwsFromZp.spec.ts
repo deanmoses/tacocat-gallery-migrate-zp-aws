@@ -5,8 +5,10 @@ import { ZenphotoAlbum, ZenphotoImageItem } from './zenphotoTypes.js';
 describe('convert image path', () => {
     const imagePaths: { zp: string; aws: string }[] = [
         { zp: '2001/12-31/image.jpg', aws: '/2001/12-31/image.jpg' },
-        { zp: '2001/12-31/image.JPG', aws: '/2001/12-31/image.jpg' },
-        { zp: '2001/12-31/image.jpeg', aws: '/2001/12-31/image.jpg' },
+        { zp: '2001/12-31/image.JPG', aws: '/2001/12-31/image.JPG' },
+        { zp: '2001/12-31/image.jpeg', aws: '/2001/12-31/image.jpeg' },
+        { zp: '2001/12-31/image.gif', aws: '/2001/12-31/image.gif' },
+        { zp: '2001/12-31/image.png', aws: '/2001/12-31/image.png' },
     ];
     imagePaths.forEach((imagePaths) => {
         it(`Convert ${imagePaths.zp} → ${imagePaths.aws}`, () => {

@@ -19,6 +19,7 @@ export function convertAlbum(zpAlbum: ZenphotoAlbum): AwsGalleryItem[] {
         updatedOn: zpAlbum.date_updated ? convertDate(zpAlbum.date_updated) : convertDate(zpAlbum.date),
         published: 'published' in zpAlbum ? !!zpAlbum.published : true,
     };
+    if (!awsAlbum.published) console.warn(`Album not published: ${albumPath}`);
     if (zpAlbum.customdata) awsAlbum.summary = zpAlbum.customdata;
     if (zpAlbum.desc) awsAlbum.description = convertDescription(zpAlbum.desc);
     items.push(awsAlbum);
@@ -70,11 +71,9 @@ function convertAlbumPath(albumPath: string): string {
 /**
  * Convert from
  *  2001/12-31/image.jpg  to /2001/12-31/image.jpg
- *  2001/12-31/image.JPG  to /2001/12-31/image.jpg
- *  2001/12-31/image.jpeg to /2001/12-31/image.jpg
  */
 export function convertImagePath(imagePath: string): string {
-    return `/${imagePath}`.replace(/\.jpe?g$/gi, '.jpg');
+    return `/${imagePath}`;
 }
 
 /** Convert from 1009785600 to ISO string */
