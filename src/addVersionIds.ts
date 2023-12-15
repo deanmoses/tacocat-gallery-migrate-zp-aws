@@ -1,5 +1,6 @@
 //
 // Add AWS S3 version IDs to the image entries in the local SQLite database
+// This script is meant to run on my local laptop
 //
 
 import { getPaths, setVersionId } from './lib/db.js';

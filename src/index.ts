@@ -1,5 +1,6 @@
 //
 // Fetch albums from Zenphoto and upseert them into SQLite
+// This script is meant to run on my local laptop
 //
 
 import { upsertItems } from './lib/db.js';
