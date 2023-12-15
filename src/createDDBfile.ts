@@ -1,5 +1,6 @@
 //
 // Output the local SQLite database as a DynamoDB JSON Lines (JSONL) file
+// This script is meant to run on my local laptop
 //
 
 import { createWriteStream } from 'fs';
