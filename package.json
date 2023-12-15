@@ -12,6 +12,8 @@
     "main": "index.js",
     "scripts": {
         "zenphoto": "node --loader ts-node/esm src/index.js",
+        "verify-local-files": "node --loader ts-node/esm src/verifyLocalFiles.js",
+        "verify-local-db": "node --loader ts-node/esm src/verifyLocalDb.js",
         "versionIds": "node --loader ts-node/esm src/addVersionIds.js",
         "ddb": "node --loader ts-node/esm src/createDDBfile.js",
         "test": "jest"
