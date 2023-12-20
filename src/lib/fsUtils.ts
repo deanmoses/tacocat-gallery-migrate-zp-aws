@@ -2,12 +2,24 @@
 // Utilities for working with gallery items on the local filesystem
 //
 
-import { existsSync, lstatSync, readdirSync } from 'fs';
+import { existsSync, lstatSync, readFileSync, readdirSync } from 'fs';
 import { isValidAlbumPath, isValidImagePath } from './galleryPathUtils.js';
 import { join } from 'path';
+import { ZenphotoAlbum } from './zenphotoTypes.js';
 
 // /Users/moses/Desktop/zenphoto/albums/2001/12-31
 const galleryDir = '/Users/moses/Desktop/zenphoto/albums';
+const yearAlbumJsonDir = '/Users/moses/Desktop/p_json';
+
+/** Get *.json files */
+export function getYearJsonFile(year: string): ZenphotoAlbum {
+    const yearAlbumFilename = `${yearAlbumJsonDir}/${year}.json`;
+    if (!existsSync(yearAlbumFilename)) {
+        throw new Error(`[${yearAlbumFilename}] no such file`);
+    }
+    const fileContent = readFileSync(yearAlbumFilename, 'utf-8');
+    return JSON.parse(fileContent).album as ZenphotoAlbum;
+}
 
 /** Get all files and folders under path */
 export function getFilesAndFolders(albumPath: string): string[] {

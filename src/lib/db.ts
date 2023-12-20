@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import { AwsGalleryItem } from './awsTypes.js';
-import { isValidImagePath } from './galleryPathUtils.js';
+import { isValidAlbumPath, isValidImagePath } from './galleryPathUtils.js';
 
 const TABLE_NAME = 'GalleryItems';
 
@@ -40,6 +40,19 @@ export async function setVersionId(imagePath: string, versionId: string): Promis
         imagePath,
     );
     if (results?.changes !== 1) throw new Error(`No rows updated for [${imagePath}]`);
+}
+
+/** Set the thumbnail of an existing album entry */
+export async function setAlbumThumb(albumPath: string, imagePath: string): Promise<void> {
+    if (!isValidAlbumPath(albumPath)) throw new Error(`Invalid album path: [${albumPath}]`);
+    if (!isValidImagePath(imagePath)) throw new Error(`Invalid image path: [${imagePath}]`);
+    const db = await openDb();
+    const results = await db.run(
+        `UPDATE ${TABLE_NAME} SET json = json_set(json, '$.thumbnail', ?) WHERE path = ?`,
+        JSON.stringify({ path: imagePath }),
+        albumPath,
+    );
+    if (results?.changes !== 1) throw new Error(`No rows updated for [${albumPath}]`);
 }
 
 /** Create or update mutiple items */

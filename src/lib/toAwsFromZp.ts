@@ -104,6 +104,39 @@ export function convertCrop(zpThumbUrl: string | undefined): Rectangle | undefin
     return crop;
 }
 
+/**
+ * Extract image path from URLs like:
+ *   /zenphoto/cache/1943/01-01/1943-soublins_w200_h200_cw1493_ch1493_cx985_cy407_thumb.jpg?t=1418458445
+ *   /zenphoto/cache/1969/07-20/marriage08_200_cw200_ch200_thumb.jpg?t=1418719978
+ *   /zenphoto/cache/1977/12-01/1977-Lu_200_w200_h200_cw200_ch200_thumb.jpg?cached=1548530166
+ *   /zenphoto/zp-core/i.php?a=1975/12-31&i=1975-relatives-christmas.jpg&s=200&w=200&h=200&cw=200&ch=200&q=85&c=1&t=1&wmk=!&check=7d296a2339b1244fc14ea3790d0e0b801f91e3fa
+ */
+export function extractAlbumThumbnailImage(zpThumbUrl: string): string {
+    if (!zpThumbUrl) throw new Error(`No thumbnail URL`);
+    // let regex =
+    //     /^\/zenphoto\/cache(?<thumbPath>(?:(?!_\d\d\d|_w\d\d\d|_h\d\d\d|_cw\d\d\d|_ch\d\d\d|_cx\d\d\d|_cy\d\d\d).)+)(_\d\d\d)?(_w\d+)?(_h\d+)?(_cw\d+)?(_ch\d+)?(_cx\d+)?(_cy\d+)?(_thumb)\.(?<ext>[a-z]+)\?/i;
+
+    let regex =
+        /^\/zenphoto\/cache(?<thumbPath>[^.]+?)(_\d\d\d)?(_w\d+)?(_h\d+)?(_cw\d+)?(_ch\d+)?(_cx\d+)?(_cy\d+)?(_thumb)\.(?<ext>[a-z]+)\?/i;
+    let z = regex.exec(zpThumbUrl);
+    if (!!z && !!z.groups) {
+        const { thumbPath, ext } = z.groups;
+        if (!thumbPath) throw new Error(`No thumbPath: ${zpThumbUrl}`);
+        if (!ext) throw new Error(`No extension: ${zpThumbUrl}`);
+        const imagePath = `${thumbPath}.${ext}`;
+        return imagePath;
+    } else {
+        regex = /^\/zenphoto\/zp-core\/i\.php\?a=(?<thumbPath>[^&]+)&i=(?<filename>[^&]+)&/i;
+        z = regex.exec(zpThumbUrl);
+        if (!z || !z.groups) throw new Error(`Did not extract image path from URL: ${zpThumbUrl}`);
+        const { thumbPath, filename } = z.groups;
+        if (!thumbPath) throw new Error(`No thumbPath: ${zpThumbUrl}`);
+        if (!filename) throw new Error(`No filename: ${zpThumbUrl}`);
+        const imagePath = `/${thumbPath}/${filename}`;
+        return imagePath;
+    }
+}
+
 /** Strip any HTML from the Zenphoto title */
 function convertTitle(zpTitle: string): string {
     return convertHtmlEntities(zpTitle); // I think titles just have HTML entities and not tags

@@ -1,5 +1,12 @@
 import { AwsAlbum, AwsGalleryItem, AwsImageItem, Rectangle } from './awsTypes.js';
-import { convertAlbum, convertCrop, convertDescription, convertImage, convertImagePath } from './toAwsFromZp.js';
+import {
+    convertAlbum,
+    convertCrop,
+    convertDescription,
+    convertImage,
+    convertImagePath,
+    extractAlbumThumbnailImage,
+} from './toAwsFromZp.js';
 import { ZenphotoAlbum, ZenphotoImageItem } from './zenphotoTypes.js';
 
 describe('convert image path', () => {
@@ -71,6 +78,36 @@ describe('convert description', () => {
     descriptions.forEach((description) => {
         it(`Convert ${description.zp} → ${description.aws}`, () => {
             expect(convertDescription(description.zp)).toEqual(description.aws);
+        });
+    });
+});
+
+describe('convert album thumbnail', () => {
+    const tests: { url: string; imagePath: string }[] = [
+        {
+            url: '/zenphoto/cache/1943/01-01/1943-soublins_w200_h200_cw1493_ch1493_cx985_cy407_thumb.jpg?t=1418458445',
+            imagePath: '/1943/01-01/1943-soublins.jpg',
+        },
+        {
+            url: '/zenphoto/cache/1969/07-20/marriage08_200_cw200_ch200_thumb.jpg?t=1418719978',
+            imagePath: '/1969/07-20/marriage08.jpg',
+        },
+        {
+            url: '/zenphoto/cache/1977/12-01/1977-Lu_200_w200_h200_cw200_ch200_thumb.jpg?cached=1548530166',
+            imagePath: '/1977/12-01/1977-Lu.jpg',
+        },
+        {
+            url: '/zenphoto/zp-core/i.php?a=1975/12-31&i=1975-relatives-christmas.jpg&s=200&w=200&h=200&cw=200&ch=200&q=85&c=1&t=1&wmk=!&check=7d296a2339b1244fc14ea3790d0e0b801f91e3fa',
+            imagePath: '/1975/12-31/1975-relatives-christmas.jpg',
+        },
+        {
+            url: '/zenphoto/cache/2007/08-19/1174879510_3624889886_o_200_cw200_ch200_thumb.jpg?t=1419197199',
+            imagePath: '/2007/08-19/1174879510_3624889886_o.jpg',
+        },
+    ];
+    tests.forEach(({ url, imagePath }) => {
+        it(`Convert ${url} → ${imagePath}`, () => {
+            expect(extractAlbumThumbnailImage(url)).toEqual(imagePath);
         });
     });
 });

@@ -11,12 +11,13 @@
     },
     "main": "index.js",
     "scripts": {
+        "test": "jest",
         "zenphoto": "node --loader ts-node/esm src/index.js",
         "verify-local-files": "node --loader ts-node/esm src/verifyLocalFiles.js",
         "verify-local-db": "node --loader ts-node/esm src/verifyLocalDb.js",
         "versionId": "node --loader ts-node/esm src/addVersionIds.js",
         "ddb-file-create": "node --loader ts-node/esm src/createDDBfile.js",
-        "test": "jest"
+        "get-album-thumbs": "node --loader ts-node/esm src/getAlbumThumbs.js"
     },
     "devDependencies": {
         "@types/jest": "^29.5.11",
