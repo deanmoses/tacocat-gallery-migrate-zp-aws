@@ -23,6 +23,17 @@ export async function getAllItems(): Promise<AwsGalleryItem[]> {
     return items;
 }
 
+/** Retrieve all items under the specified path */
+export async function getItems(pathPrefix: string): Promise<AwsGalleryItem[]> {
+    const db = await openDb();
+    const results = await db.all(`SELECT json FROM ${TABLE_NAME} WHERE path LIKE ?`, pathPrefix + '%');
+    const items: AwsGalleryItem[] = [];
+    for (const result of results) {
+        items.push(JSON.parse(result.json));
+    }
+    return items;
+}
+
 /** Retrieve item */
 export async function getItem(path: string): Promise<AwsGalleryItem> {
     const db = await openDb();
@@ -46,10 +57,11 @@ export async function setVersionId(imagePath: string, versionId: string): Promis
 export async function setAlbumThumb(albumPath: string, imagePath: string): Promise<void> {
     if (!isValidAlbumPath(albumPath)) throw new Error(`Invalid album path: [${albumPath}]`);
     if (!isValidImagePath(imagePath)) throw new Error(`Invalid image path: [${imagePath}]`);
+    const albumThumb = { path: imagePath };
     const db = await openDb();
     const results = await db.run(
         `UPDATE ${TABLE_NAME} SET json = json_set(json, '$.thumbnail', ?) WHERE path = ?`,
-        JSON.stringify({ path: imagePath }),
+        albumThumb,
         albumPath,
     );
     if (results?.changes !== 1) throw new Error(`No rows updated for [${albumPath}]`);

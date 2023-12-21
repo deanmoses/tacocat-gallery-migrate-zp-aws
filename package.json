@@ -17,7 +17,8 @@
         "verify-local-db": "node --loader ts-node/esm src/verifyLocalDb.js",
         "versionId": "node --loader ts-node/esm src/addVersionIds.js",
         "ddb-file-create": "node --loader ts-node/esm src/createDDBfile.js",
-        "get-album-thumbs": "node --loader ts-node/esm src/getAlbumThumbs.js"
+        "get-album-thumbs": "node --loader ts-node/esm src/getAlbumThumbs.js",
+        "fix-album-thumbs": "node --loader ts-node/esm src/fixAlbumThumbs.js"
     },
     "devDependencies": {
         "@types/jest": "^29.5.11",
