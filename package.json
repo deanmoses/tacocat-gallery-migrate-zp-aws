@@ -19,7 +19,8 @@
         "DONE-ddb-file-create": "DONEnode --loader ts-node/esm src/createDDBfile.js",
         "DONE-get-album-thumbs": "DONEnode --loader ts-node/esm src/getAlbumThumbs.js",
         "DONE-fix-album-thumbs": "DONEnode --loader ts-node/esm src/fixAlbumThumbs.js",
-        "DONE-fix-tags": "DONEnode --loader ts-node/esm src/fixTags.js"
+        "DONE-fix-tags": "DONEnode --loader ts-node/esm src/fixTags.js",
+        "DONE-prepopulate-derived-images": "DONEnode --loader ts-node/esm src/prepopulateDerivedImages.js"
     },
     "devDependencies": {
         "@types/jest": "^29.5.11",
